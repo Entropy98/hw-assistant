@@ -19,5 +19,5 @@ from assistant import views
 
 urlpatterns = [
     path('', views.home),
-    path('test',views.test),
+    path('add_grocery',views.add_grocery),
 ]
