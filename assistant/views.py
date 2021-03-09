@@ -16,22 +16,101 @@ def home(request):
         return render(request,"assistant/index.html", context)
     return render(request,"assistant/index.html", context)
 
+def extractNum(s):
+    res = ''
+    for c in s:
+        if(c.isnumeric()):
+            res = res + c
+    return int(res)
+
+@csrf_exempt
+def add_stock(request):
+    if(request.method == 'GET'):
+        return render(request,"assistant/index.html")
+    body = json.loads(request.body.decode('utf-8'))
+    for word in body:
+        word = word.replace(' ','')
+    if(('quantity' in body) and ('grocery' in body)):
+        try:
+            #known grocery
+            grocery = GroceryItem.objects.get(name=body['grocery'])
+            if(grocery.quantity > 0):#in stock list
+                grocery.quantity += int(body['quantity'])
+            else:
+                grocery.quantity = int(body['quantity'])
+        except:
+            #new grocery
+            grocery = GroceryItem(  name=body['grocery'],
+                                    category='misc',
+                                    quantity=extractNum(body['quantity']))
+        grocery.save()
+    return update_lists(request)
+
+@csrf_exempt
+def remove_stock(request):
+    if(request.method == 'GET'):
+        return render(request,"assistant/index.html")
+    body = json.loads(request.body.decode('utf-8'))
+    for word in body:
+        word = word.replace(' ','')
+    if(('quantity' in body) and ('grocery' in body)):
+        try:
+            #known grocery
+            grocery = GroceryItem.objects.get(name=body['grocery'])
+            quant = int(body['quantity'])
+            if(grocery.quantity > 0):#in stock list
+                if(quant <= grocery.quantity):
+                    grocery.quantity -= quant
+                else:
+                    grocery.quantity = 0
+                grocery.save()
+        except:
+            #grocery not found
+            pass
+    return update_lists(request)
+
 @csrf_exempt
 def add_grocery(request):
     if(request.method == 'GET'):
         return render(request,"assistant/index.html")
     body = json.loads(request.body.decode('utf-8'))
+    print(body)
     if(('quantity' in body) and ('grocery' in body)):
         try:
             #known grocery
             grocery = GroceryItem.objects.get(name=body['grocery'])
-            grocery.quantity += int(body['quantity'])
+            if(grocery.quantity < 0):#in grocery list
+                grocery.quantity -= int(body['quantity'])
+            else:#remove from stock and add to grocery list
+                grocery.quantity = -1*int(body['quantity'])
         except:
             #new grocery
             grocery = GroceryItem(  name=body['grocery'],
                                     category='misc',
-                                    quantity=body['quantity'])
+                                    quantity=-1*extractNum(body['quantity']))
         grocery.save()
+    return update_lists(request)
+
+@csrf_exempt
+def remove_grocery(request):
+    if(request.method == 'GET'):
+        return render(request,"assistant/index.html")
+    body = json.loads(request.body.decode('utf-8'))
+    print(body)
+    if(('quantity' in body) and ('grocery' in body)):
+        try:
+            #known grocery
+            grocery = GroceryItem.objects.get(name=body['grocery'])
+            quant = int(body['quantity'])
+            if(grocery.quantity < 0):#in grocery list
+                if(quant <= abs(grocery.quantity)):
+                    grocery.quantity += quant
+                else:
+                    grocery.quantity = 0
+                grocery.save()
+        except:
+            #grocery not found
+            pass
     return update_lists(request)
 
 def update_lists(request):
@@ -40,9 +119,10 @@ def update_lists(request):
     for list_type in lists:
         list_type_obj={}
         for grocery in GroceryItem.objects.filter(category=list_type):
-            if(grocery.quantity > 0):
+            if(grocery.quantity != 0):
                 list_type_obj[grocery.name] = grocery.quantity
-        list_obj[list_type] = list_type_obj
+        if(len(list_type_obj) > 0):
+            list_obj[list_type] = list_type_obj
     json_response.append(list_obj)
     response_json = json.dumps(json_response)
     response = HttpResponse(response_json, content_type='application/json')

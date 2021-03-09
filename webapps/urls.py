@@ -20,5 +20,8 @@ from assistant import views
 urlpatterns = [
     path('', views.home),
     path('add_grocery',views.add_grocery),
+    path('add_stock',views.add_stock),
+    path('remove_grocery',views.remove_grocery),
+    path('remove_stock',views.remove_stock),
     path('update_lists',views.update_lists),
 ]

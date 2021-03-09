@@ -10,8 +10,15 @@
   <body>
     <h1 id="error"></h1>
     <div id="grocery-lists">
+      <h1 class="list-header">Grocery List</h1>
       {% for category in categories %}
-        <h1 class="list-label" id="{{category}}-list-label">{{category}} list</h1>
+        <h2 class="list-label" id="{{category}}-grocery-list-label">{{category|title}}</h2>
+      {% endfor %}
+    </div>
+    <div id="stock-lists">
+      <h1 class="list-header">Stock List</h1>
+      {% for category in categories %}
+        <h2 class="list-label" id="{{category}}-stock-list-label">{{category|title}}</h2>
       {% endfor %}
     </div>
     <script>
