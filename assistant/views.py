@@ -10,11 +10,17 @@ import json
 #categories of lists
 lists=['produce','alcohol','pantry','dairy','misc']
 
-def home(request):
+def grocery(request):
     context={'categories': lists}
     if(request.method == 'GET'):
-        return render(request,"assistant/index.html", context)
-    return render(request,"assistant/index.html", context)
+        return render(request,"assistant/grocery.html", context)
+    return render(request,"assistant/grocery.html", context)
+
+def menu(request):
+    pass
+
+def toDo(request):
+    pass
 
 def extractNum(s):
     res = ''
@@ -24,9 +30,19 @@ def extractNum(s):
     return int(res)
 
 @csrf_exempt
+def swap_list(request):
+    if(request.method == 'GET'):
+        return render(request,"assistant/grocery.html")
+    if(('quantity' in request.POST) and ('grocery' in request.POST)):
+        grocery = GroceryItem.objects.get(name=request.POST['grocery'])
+        grocery.quantity = grocery.quantity * -1
+        grocery.save()
+    return update_lists(request)
+
+@csrf_exempt
 def add_stock(request):
     if(request.method == 'GET'):
-        return render(request,"assistant/index.html")
+        return render(request,"assistant/grocery.html")
     body = json.loads(request.body.decode('utf-8'))
     for word in body:
         word = word.replace(' ','')
@@ -49,7 +65,7 @@ def add_stock(request):
 @csrf_exempt
 def remove_stock(request):
     if(request.method == 'GET'):
-        return render(request,"assistant/index.html")
+        return render(request,"assistant/grocery.html")
     body = json.loads(request.body.decode('utf-8'))
     for word in body:
         word = word.replace(' ','')
@@ -72,7 +88,7 @@ def remove_stock(request):
 @csrf_exempt
 def add_grocery(request):
     if(request.method == 'GET'):
-        return render(request,"assistant/index.html")
+        return render(request,"assistant/grocery.html")
     body = json.loads(request.body.decode('utf-8'))
     print(body)
     if(('quantity' in body) and ('grocery' in body)):
@@ -94,9 +110,16 @@ def add_grocery(request):
 @csrf_exempt
 def remove_grocery(request):
     if(request.method == 'GET'):
-        return render(request,"assistant/index.html")
+        return render(request,"assistant/grocery.html")
+    print(request.POST)
+    if(('quantity' in request.POST) and ('grocery' in request.POST)):
+        if(int(request.POST['quantity']) == 0):
+            grocery = GroceryItem.objects.get(name=request.POST['grocery'])
+            grocery.quantity = 0
+            grocery.save()
+            return update_lists(request)
+
     body = json.loads(request.body.decode('utf-8'))
-    print(body)
     if(('quantity' in body) and ('grocery' in body)):
         try:
             #known grocery

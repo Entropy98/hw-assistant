@@ -18,7 +18,12 @@ from django.urls import path
 from assistant import views
 
 urlpatterns = [
-    path('', views.home),
+    path('', views.grocery),
+    path('grocery',views.grocery, name='grocery'),
+    path('menu',views.menu, name='menu'),
+    path('to-do',views.toDo, name='to-do'),
+    path('store_grocery',views.swap_list),
+    path('repeat_grocery',views.swap_list),
     path('add_grocery',views.add_grocery),
     path('add_stock',views.add_stock),
     path('remove_grocery',views.remove_grocery),

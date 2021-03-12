@@ -1,3 +1,52 @@
+function removeItem(item){
+  let name = item.id.substring("remove-".length);
+  name = ' '+name.replace('-',' ');
+  $.ajax({
+    url: '/remove_grocery',
+    type: 'POST',
+    data: 'grocery='+name+'&quantity=0',
+    dataType: 'json',
+    success: updateLists,
+    error: updateError
+  });
+}
+
+function storeItem(item){
+  let name = item.id.substring("store-".length);
+  name = ' '+name.replace('-',' ');
+  $.ajax({
+    url: '/store_grocery',
+    type: 'POST',
+    data: 'grocery='+name+'&quantity=0',
+    dataType: 'json',
+    success: updateLists,
+    error: updateError
+  });
+}
+
+function repeatItem(item){
+  let name = item.id.substring("buy-again-".length);
+  name = ' '+name.replace('-',' ');
+  $.ajax({
+    url: '/repeat_grocery',
+    type: 'POST',
+    data: 'grocery='+name+'&quantity=0',
+    dataType: 'json',
+    success: updateLists,
+    error: updateError
+  });
+}
+
+function toggleMenu(){
+  let menu = document.getElementById('nav-menu');
+  if(menu.style.display == 'none'){
+    menu.style.display = 'inline-block';
+  }
+  else{
+    menu.style.display = 'none';
+  }
+}
+
 function getLists(){
   $.ajax({
     url: '/update_lists',
@@ -42,8 +91,14 @@ function updateLists(lists){
           let item = items[j];
           let quantity = this[category][item]
           if(quantity < 0){
-            checklist += '<li id="'+category+'-item-'+j+'">'+
-                            formatItem(item) +' x'+ (-1*quantity) +'</li>';
+            checklist +=  '<hr>'+
+                          '<li id="'+category+'-item-'+j+'">'+
+                            formatItem(item) +' x'+ (-1*quantity) + '  '+
+                            '<i onclick="removeItem(this)" class="far fa-times-circle remove-btn"'+
+                            'id="remove-'+formatItemId(item)+'"></i>'+
+                            '<i onclick="storeItem(this)" class="far fa-check-circle store-btn"'+
+                            'id="store-'+formatItemId(item)+'"></i>'+
+                          '</li>';
           }
         }
         checklist += '</ul>';
@@ -57,8 +112,14 @@ function updateLists(lists){
           let item = items[j];
           let quantity = this[category][item]
           if(quantity > 0){
-            checklist += '<li id="'+category+'-item-'+j+'">'+
-                            formatItem(item) +' x'+ quantity +'</li>';
+            checklist +=  '<hr>'+
+                          '<li id="'+category+'-item-'+j+'">'+
+                            formatItem(item) +' x'+ quantity +'  '+
+                            '<i onclick="removeItem(this)" class="far fa-times-circle remove-btn"'+
+                            'id="remove-'+formatItemId(item)+'"></i>'+
+                            '<i onclick="repeatItem(this)" class="fas fa-redo buy-again-btn"'+
+                            'id="buy-again-'+formatItemId(item)+'"></i>'+
+                          '</li>';
           }
         }
         checklist += '</ul>';
@@ -76,6 +137,21 @@ function formatItem(item){
     let word = stringArray[i];
     if(word != ''){
       retval += word.charAt(0).toUpperCase() + word.slice(1) + ' ';
+    }
+  }
+  return retval
+}
+
+function formatItemId(item){
+  var stringArray = item.split(' ');
+  let retval = '';
+  for(var i=0; i<stringArray.length; i++){
+    let word = stringArray[i];
+    if(word != ''){
+      retval += word;
+      if(i != stringArray.length-1){
+        retval += '-';
+      }
     }
   }
   return retval

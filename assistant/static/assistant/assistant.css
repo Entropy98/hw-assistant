@@ -1,0 +1,133 @@
+:root {
+  --dark-red    : #541209;
+  --green       : #1A860D;
+  --dark-gray   : #120605;
+  --gray        : #312D39;
+  --light-tan   : #C88E55;
+  --green-gray  : #181C14;
+  --orange      : #A7240D;
+  --brown       : #302324;
+  --tan         : #814F32;
+  --light-brown : #4F3735;
+  --font-family-sans-serif: "Lato", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,             "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe        UI Symbol", "Noto Color Emoji";
+}
+
+body {
+  background-color: var(--brown);
+  color: var(--light-tan);
+  margin: 0;
+  font-family: var(--font-family-sans-serif);
+}
+
+nav{
+}
+
+a{
+  text-decoration: none;
+  color: inherit;
+}
+
+hr{
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#nav-menu{
+  position: fixed;
+  left: 0;
+  margin-top: 5%;
+  background-color: var(--light-brown);
+  padding-right: 5%;
+}
+
+#nav-menu > ul{
+  list-style-type: none;
+}
+
+#nav-menu > ul > li{
+  margin: 15px 0;
+}
+
+#nav-button{
+  background-color: var(--light-brown);
+  color: var(--green);
+  border: none;
+  margin: 1%;
+  padding: 2%;
+  border-radius: 15%;
+  font-size: 25px;
+  position: fixed;
+  top: 1%;
+  left: 1%;
+}
+//desktop
+@media screen and (max-width: 700px){
+  #navbutton{
+    font-size: 25px;
+  }
+}
+//mobile
+@media screen and (min-width: 700px){
+  #navbutton{
+    font-size: 50px;
+  }
+}
+
+.list-container{
+  background-color: var(--light-tan);
+  color: var(--green-gray);
+  width: 75%;
+  text-align: center;
+  border-radius: 5%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 5%;
+  padding-bottom: 5%;
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+
+.list-container > hr{
+  width: 90%;
+  color: var(--light-tan);
+}
+
+.list-container > ul{
+  list-style-type: none;
+  margin-left: -30px;
+}
+
+.list-container > ul > hr{
+  width: 90%;
+  color: var(--light-tan);
+}
+
+.list-container > ul > li{
+  margin: 15px 0;
+}
+
+.remove-btn{
+  color: inherit;
+}
+
+.store-btn{
+  color: inherit;
+}
+
+.buy-again-btn{
+  color: inherit;
+}
+
+.remove-btn:hover{
+  color: var(--orange);
+}
+
+.store-btn:hover{
+  color: var(--green);
+}
+
+.buy-again-btn:hover{
+  color: var(--green);
+}
