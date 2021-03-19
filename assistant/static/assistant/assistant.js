@@ -1,6 +1,6 @@
 function removeItem(item){
   let name = item.id.substring("remove-".length);
-  name = ' '+name.replace('-',' ');
+  name = ' '+name.replaceAll('-',' ');
   $.ajax({
     url: '/remove_grocery',
     type: 'POST',
@@ -13,7 +13,7 @@ function removeItem(item){
 
 function storeItem(item){
   let name = item.id.substring("store-".length);
-  name = ' '+name.replace('-',' ');
+  name = ' '+name.replaceAll('-',' ');
   $.ajax({
     url: '/store_grocery',
     type: 'POST',
@@ -26,7 +26,7 @@ function storeItem(item){
 
 function repeatItem(item){
   let name = item.id.substring("buy-again-".length);
-  name = ' '+name.replace('-',' ');
+  name = ' '+name.replaceAll('-',' ');
   $.ajax({
     url: '/repeat_grocery',
     type: 'POST',
