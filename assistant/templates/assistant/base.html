@@ -11,7 +11,10 @@
     <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
   </head>
   <nav>
-    <button id="nav-button" onclick="toggleMenu()">
+    <button class="nav-button" onclick="toggleMenu()">
+      <i class="fas fa-bars"></i>
+    </button>
+    <button class="nav-button-mobile" onclick="toggleMenu()">
       <i class="fas fa-bars"></i>
     </button>
     <div id="nav-menu" style="display: none;">

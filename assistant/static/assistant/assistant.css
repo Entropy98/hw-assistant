@@ -50,7 +50,7 @@ hr{
   margin: 15px 0;
 }
 
-#nav-button{
+.nav-button{
   background-color: var(--light-brown);
   color: var(--green);
   border: none;
@@ -62,16 +62,28 @@ hr{
   top: 1%;
   left: 1%;
 }
-//desktop
-@media screen and (max-width: 700px){
-  #navbutton{
-    font-size: 25px;
+.nav-button-mobile{
+  background-color: var(--light-brown);
+  color: var(--green);
+  border: none;
+  margin: 1%;
+  padding: 2%;
+  border-radius: 15%;
+  font-size: 25px;
+  position: fixed;
+  top: 1%;
+  left: 1%;
+}
+/*desktop*/
+@media (max-width: 992px){
+  .nav-button{
+    display: none;
   }
 }
-//mobile
-@media screen and (min-width: 700px){
-  #navbutton{
-    font-size: 50px;
+/*mobile*/
+@media (min-width: 992px){
+  .nav-button-mobile{
+    display: none;
   }
 }
 
