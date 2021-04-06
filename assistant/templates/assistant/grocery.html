@@ -1,6 +1,7 @@
 {% extends "assistant/base.html" %}
+  {% load static %}
   {% block content %}
-    <div id="grocery-lists" class="list-container">
+  <div id="grocery-lists" class="list-container" style="background-image: url('{% static 'assistant/img/paper.jpg' %}')">
       <h1 class="list-header">Grocery List</h1>
       <hr>
       {% for category in categories %}
@@ -8,7 +9,7 @@
         <hr>
       {% endfor %}
     </div>
-    <div id="stock-lists" class="list-container">
+    <div id="stock-lists" class="list-container" style="background-image: url('{% static 'assistant/img/paper.jpg' %}')">
       <h1 class="list-header">Stock List</h1>
       <hr>
       {% for category in categories %}

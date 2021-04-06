@@ -21,6 +21,7 @@ urlpatterns = [
     path('', views.grocery),
     path('grocery',views.grocery, name='grocery'),
     path('menu',views.menu, name='menu'),
+    path('cookbook',views.cookbook, name='cookbook'),
     path('to-do',views.toDo, name='to-do'),
     path('store_grocery',views.swap_list),
     path('repeat_grocery',views.swap_list),

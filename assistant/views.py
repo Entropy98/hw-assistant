@@ -9,6 +9,7 @@ import json
 
 #categories of lists
 lists=['produce','alcohol','pantry','dairy','misc']
+recipe_cats=['breakfast','dinner','cocktails','ingredients']
 
 def grocery(request):
     context={'categories': lists}
@@ -28,6 +29,47 @@ def extractNum(s):
         if(c.isnumeric()):
             res = res + c
     return int(res)
+
+def cookbook(request):
+    context={}
+    categories={}
+    for cat in recipe_cats:
+        recipes_obj=[]
+        recipes = RecipeItem.objects.filter(category=cat)
+        for recipe in recipes:
+            recipe_obj = {
+                    'name': recipe.name,
+                    'thumbnail': recipe.shortname}
+            makeable = True
+            gluten = False
+            dairy = False
+            missing_ingredients = []
+            ingredients = []
+            for ingr in recipe.ingredients.all():
+                ingredients.append(ingr.name)
+                if(ingr.quantity < 1):
+                    missing_ingredients.append(ingr.name)
+                    makeable = False
+                if(ingr.gluten):
+                    gluten = True
+                if(ingr.dairy):
+                    dairy = True
+            recipe_obj['makeable'] = makeable
+            recipe_obj['gluten'] = gluten
+            recipe_obj['dairy'] = dairy
+            recipe_obj['ingredients'] = ingredients
+            recipe_obj['missing_ingredients'] = missing_ingredients
+            optional_ingredients = []
+            for ingr in recipe.optional_ingredients.all():
+                optional_ingredients.append(ingr.name)
+            recipe_obj['optional_ingredients'] = optional_ingredients
+            recipes_obj.append(recipe_obj)
+        categories[cat] = recipes_obj
+    context['categories'] = categories
+
+    if(request.method == 'GET'):
+        return render(request,"assistant/cookbook.html", context)
+    return render(request,"assistant/cookbook.html", context)
 
 @csrf_exempt
 def swap_list(request):

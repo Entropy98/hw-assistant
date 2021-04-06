@@ -11,21 +11,22 @@
     <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
   </head>
   <nav>
-    <button class="nav-button" onclick="toggleMenu()">
+    <button id="nav-button" class="nav-button" onclick="toggleMenu()">
       <i class="fas fa-bars"></i>
     </button>
-    <button class="nav-button-mobile" onclick="toggleMenu()">
+    <button id="nav-button-mobile" class="nav-button-mobile" onclick="toggleMenu()">
       <i class="fas fa-bars"></i>
     </button>
     <div id="nav-menu" style="display: none;">
       <ul>
         <li><a href="{% url 'grocery' %}">Grocery List</a></li>
         <li><a href="{% url 'menu' %}">Menu</a></li>
+        <li><a href="{% url 'cookbook' %}">Cook Book</a></li>
         <li><a href="{% url 'to-do' %}">To-Do List</a></li>
       </ul>
     </div>
   </nav>
-  <body>
+  <body style="background-image: url('{% static 'assistant/img/wood.jpg' %}')">
     <h1 id="error"></h1>
     {% block content %}
     {% endblock %}

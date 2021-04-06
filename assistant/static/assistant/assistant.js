@@ -39,12 +39,19 @@ function repeatItem(item){
 
 function toggleMenu(){
   let menu = document.getElementById('nav-menu');
+  let button = document.getElementById('nav-button');
+  let button_mobile = document.getElementById('nav-button-mobile');
   if(menu.style.display == 'none'){
     menu.style.display = 'inline-block';
+    button.innerHTML = '<i class="fas fa-times"></i>';
+    button_mobile.innerHTML = '<i class="fas fa-times"></i>';
   }
   else{
     menu.style.display = 'none';
+    button.innerHTML = '<i class="fas fa-bars"></i>';
+    button_mobile.innerHTML = '<i class="fas fa-bars"></i>';
   }
+
 }
 
 function getLists(){
