@@ -1,0 +1,18 @@
+{% extends 'assistant/base.html' %}
+{% block body %}
+{% load static %}
+<!-- Page Content -->
+  <div class="login-container" style="margin-top:12rem;">
+    <form class="login_form" method="post" action="{% url 'login' %}">
+        <div class="login_table">
+          {% for field in form %}
+              <label class="label">{{field.label}}:</label>
+              <span class="input_box">{{field}}</span>
+              <br>
+          {% endfor %}
+        </div>
+      {% csrf_token %}
+      <input class="btn" id="login_button" type="submit" value="login">
+    </form>
+  </div>
+{% endblock %}
