@@ -193,3 +193,30 @@ def update_lists(request):
     response = HttpResponse(response_json, content_type='application/json')
     return response
 
+def admin_login(request):
+    context={}
+    if(request.user.is_authenticated):
+        context['username'] = request.user.username
+    if(request.method == 'GET'):
+        context['form'] = LoginForm()
+        return render(request,'assistant/login.html', context)
+    form = LoginForm(request.POST)
+    context['form'] = form
+    return render(request,'assistant/login.html', context)
+
+def login_action(request):
+    context={}
+    if(request.user.is_authenticated):
+        context['username'] = request.user.username
+    if(request.method == 'GET'):
+        context['form'] = LoginForm()
+        return render(request,'assistant/login.html',context)
+    form = LoginForm(request.POST)
+    context['form'] = form
+
+    if not form.is_valid():
+        return render(request,'assistant/login.html',context)
+    new_user = authenticate(username=form.cleaned_data['username'],
+                            password=form.cleaned_data['password'])
+    login(request,new_user)
+    return redirect(reverse('cookbook'))
