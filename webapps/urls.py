@@ -23,6 +23,7 @@ urlpatterns = [
     path('menu',views.menu, name='menu'),
     path('cookbook',views.cookbook, name='cookbook'),
     path('to-do',views.toDo, name='to-do'),
+    path('edit',views.edit, name='edit'),
     path('store_grocery',views.swap_list),
     path('repeat_grocery',views.swap_list),
     path('add_grocery',views.add_grocery),
@@ -30,4 +31,6 @@ urlpatterns = [
     path('remove_grocery',views.remove_grocery),
     path('remove_stock',views.remove_stock),
     path('update_lists',views.update_lists),
+    path('admin', views.admin_login),
+    path('login', views.login_action, name='login'),
 ]

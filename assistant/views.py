@@ -1,8 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import login, authenticate, logout
+from django.urls import reverse
 
 from assistant.models import *
+from assistant.forms import *
 
 import json
 # Create your views here.
@@ -13,6 +16,8 @@ recipe_cats=['breakfast','dinner','cocktails','ingredients']
 
 def grocery(request):
     context={'categories': lists}
+    if(request.user.is_authenticated):
+        context['username'] = request.user.username
     if(request.method == 'GET'):
         return render(request,"assistant/grocery.html", context)
     return render(request,"assistant/grocery.html", context)
@@ -32,6 +37,8 @@ def extractNum(s):
 
 def cookbook(request):
     context={}
+    if(request.user.is_authenticated):
+        context['username'] = request.user.username
     categories={}
     for cat in recipe_cats:
         recipes_obj=[]
@@ -70,6 +77,15 @@ def cookbook(request):
     if(request.method == 'GET'):
         return render(request,"assistant/cookbook.html", context)
     return render(request,"assistant/cookbook.html", context)
+
+def edit(request):
+    context={}
+    if(request.user.is_authenticated):
+        context['username'] = request.user.username
+    context['recipes'] = RecipeItem.objects.all()
+    if(request.method == 'GET'):
+        return render(request,"assistant/edit.html", context)
+    return render(request,"assistant/edit.html", context)
 
 @csrf_exempt
 def swap_list(request):

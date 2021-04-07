@@ -23,7 +23,11 @@
         <li><a href="{% url 'menu' %}">Menu</a></li>
         <li><a href="{% url 'cookbook' %}">Cook Book</a></li>
         <li><a href="{% url 'to-do' %}">To-Do List</a></li>
+        {% if username|length > 0 %}
+          <li><a href="{% url 'edit' %}">Edit</a></li>
+        {% endif %}
       </ul>
+      <h2 id="username">{{username}}</h2>
     </div>
   </nav>
   <body style="background-image: url('{% static 'assistant/img/wood.jpg' %}')">

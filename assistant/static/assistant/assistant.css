@@ -181,3 +181,23 @@ hr{
 .recipe_card_text{
   padding-left: 10%;
 }
+
+.login-container{
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  width: 25%;
+}
+
+#username{
+  padding-left: 2rem;
+}
+
+.dropdown-content{
+  display: none;
+}
+
+.show{
+  display: block;
+}
+

@@ -1,3 +1,19 @@
+function showDropdown(){
+  document.getElementById("dropdown-content").classList.toggle("show");
+}
+
+window.onclick = function(event){
+  if(!event.target.matches('.dropdownbtn')){
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    for( var i=0; i<dropdowns.length; i++){
+      var openDropdown = dropdowns[i];
+      if(openDropdown.classList.contains('show')){
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+}
+
 function removeItem(item){
   let name = item.id.substring("remove-".length);
   name = ' '+name.replaceAll('-',' ');
@@ -162,4 +178,36 @@ function formatItemId(item){
     }
   }
   return retval
+}
+
+function updateNumIngredients(){
+  numIngr = document.getElementById('num_ingredients').value;
+  ingredients = document.getElementsByClassName('ingredient_input');
+  ingrBreaks = document.getElementsByClassName('ingredient_br');
+  while(ingredients.length>0){
+    ingredients[0].remove();
+    ingrBreaks[0].remove();
+  }
+  input = '';
+  for(var i=0; i<numIngr; i++){
+    input +=  '<input type="text" class="ingredient_input" id="ingredient_input_'+i+'" name="ingredient_input_'+i+'">'+
+              '<br class="ingredient_br">';
+  }
+  $('#ingredients_break').after(input);
+}
+
+function updateNumOptions(){
+  numIngr = document.getElementById('num_options').value;
+  ingredients = document.getElementsByClassName('option_input');
+  ingrBreaks = document.getElementsByClassName('option_br');
+  while(ingredients.length>0){
+    ingredients[0].remove();
+    ingrBreaks[0].remove();
+  }
+  input = '';
+  for(var i=0; i<numIngr; i++){
+    input +=  '<input type="text" class="option_input" id="option_input_'+i+'" name="option_input_'+i+'">'+
+              '<br class="option_br">';
+  }
+  $('#options_break').after(input);
 }
