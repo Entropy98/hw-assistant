@@ -14,6 +14,24 @@ window.onclick = function(event){
   }
 }
 
+function toggleMissingIngr(recipe){
+  document.getElementById(recipe+"_missing_list").classList.toggle("show");
+  document.getElementById(recipe+"_ingredients_list").classList.remove("show");
+  document.getElementById(recipe+"_optional_list").classList.remove("show");
+}
+
+function toggleIngr(recipe){
+  document.getElementById(recipe+"_missing_list").classList.remove("show");
+  document.getElementById(recipe+"_ingredients_list").classList.toggle("show");
+  document.getElementById(recipe+"_optional_list").classList.remove("show");
+}
+
+function toggleOptionalIngr(recipe){
+  document.getElementById(recipe+"_missing_list").classList.remove("show");
+  document.getElementById(recipe+"_ingredients_list").classList.remove("show");
+  document.getElementById(recipe+"_optional_list").classList.toggle("show");
+}
+
 function removeItem(item){
   let name = item.id.substring("remove-".length);
   name = ' '+name.replaceAll('-',' ');
@@ -184,12 +202,19 @@ function updateNumIngredients(){
   numIngr = document.getElementById('num_ingredients').value;
   ingredients = document.getElementsByClassName('ingredient_input');
   ingrBreaks = document.getElementsByClassName('ingredient_br');
-  while(ingredients.length>0){
+  prevNumIngr = -1;
+  for(var i=0; i<ingredients.length; i++){
+    index = parseInt(ingredients[i].id.substring("ingredient_input_".length));
+    if(index > prevNumIngr){
+      prevNumIngr = index;
+    }
+  }
+  while(ingredients.length>numIngr){
     ingredients[0].remove();
     ingrBreaks[0].remove();
   }
   input = '';
-  for(var i=0; i<numIngr; i++){
+  for(var i=prevNumIngr+1; i<numIngr; i++){
     input +=  '<input type="text" class="ingredient_input" id="ingredient_input_'+i+'" name="ingredient_input_'+i+'">'+
               '<br class="ingredient_br">';
   }
@@ -200,14 +225,66 @@ function updateNumOptions(){
   numIngr = document.getElementById('num_options').value;
   ingredients = document.getElementsByClassName('option_input');
   ingrBreaks = document.getElementsByClassName('option_br');
-  while(ingredients.length>0){
+  prevNumIngr = -1;
+  for(var i=0; i<ingredients.length; i++){
+    index = parseInt(ingredients[i].id.substring("option_input_".length));{
+    if(index > prevNumIngr)
+      prevNumIngr = index;
+    }
+  }
+  while(ingredients.length>numIngr){
     ingredients[0].remove();
     ingrBreaks[0].remove();
   }
   input = '';
-  for(var i=0; i<numIngr; i++){
+  for(var i=prevNumIngr+1; i<numIngr; i++){
     input +=  '<input type="text" class="option_input" id="option_input_'+i+'" name="option_input_'+i+'">'+
               '<br class="option_br">';
   }
   $('#options_break').after(input);
 }
+
+function selectRecipe(recipe){
+  $.ajax({
+    url: '/select_recipe',
+    type: 'POST',
+    data: 'recipe='+recipe+
+          '&csrfmiddlewaretoken='+getCSRFToken(),
+    dataType: 'json',
+    success: updateRecipe,
+    error: updateError
+  });
+}
+
+function updateRecipe(recipe){
+  data = recipe[0];
+  document.getElementById('recipe_name').value = data.name;
+  document.getElementById('recipe_shortname').value = data.shortname;
+  radios = document.getElementsByClassName('radio_btn');
+  for(var i=0; i<radios.length; i++){
+    radios[i].checked = false;
+  }
+  document.getElementById(data.category).checked = true;
+  document.getElementById('num_ingredients').value = data.ingredients.length;
+  document.getElementById('num_options').value = data.options.length;
+  updateNumIngredients();
+  updateNumOptions();
+  for(var i=0; i<data.ingredients.length; i++){
+    document.getElementById('ingredient_input_'+i).value = data.ingredients[i];
+  }
+  for(var i=0; i<data.options.length; i++){
+    document.getElementById('option_input_'+i).value = data.options[i];
+  }
+}
+
+function getCSRFToken(){
+  let cookies = document.cookie.split(";")
+  for (let i=0; i< cookies.length; i++){
+    let c = cookies[i].trim()
+    if(c.startsWith("csrftoken=")){
+      return c.substring("csrftoken=".length, c.length)
+    }
+  }
+  return "unknown"
+}
+

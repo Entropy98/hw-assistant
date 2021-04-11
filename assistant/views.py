@@ -46,6 +46,7 @@ def cookbook(request):
         for recipe in recipes:
             recipe_obj = {
                     'name': recipe.name,
+                    'shortname': recipe.shortname,
                     'thumbnail': recipe.shortname}
             makeable = True
             gluten = False
@@ -54,9 +55,18 @@ def cookbook(request):
             ingredients = []
             for ingr in recipe.ingredients.all():
                 ingredients.append(ingr.name)
-                if(ingr.quantity < 1):
-                    missing_ingredients.append(ingr.name)
-                    makeable = False
+                if(ingr.quantity < 1 and ingr.name!=' water'):
+                    if(len(RecipeItem.objects.filter(name=(ingr.name[1:].lower())))>0):
+                        home_ingr = RecipeItem.objects.get(name=(ingr.name[1:].lower()))
+                        for home_ingr_ingr in home_ingr.ingredients.all():
+                            if(home_ingr_ingr.quantity < 1 and home_ingr_ingr.name!=' water'):
+                                missing_ingredients.append(ingr.name)
+                                makeable = False
+                                break;
+                    else:
+                        missing_ingredients.append(ingr.name)
+                        makeable = False
+
                 if(ingr.gluten):
                     gluten = True
                 if(ingr.dairy):
@@ -92,6 +102,7 @@ def swap_list(request):
     if(request.method == 'GET'):
         return render(request,"assistant/grocery.html")
     if(('quantity' in request.POST) and ('grocery' in request.POST)):
+        grocery_name = request.POST['grocery'].replace(' - ',' ')
         grocery = GroceryItem.objects.get(name=request.POST['grocery'])
         grocery.quantity = grocery.quantity * -1
         grocery.save()
@@ -107,14 +118,16 @@ def add_stock(request):
     if(('quantity' in body) and ('grocery' in body)):
         try:
             #known grocery
-            grocery = GroceryItem.objects.get(name=body['grocery'])
+            grocery_name = body['grocery'].replace(' - ',' ')
+            grocery = GroceryItem.objects.get(name=grocery_name)
             if(grocery.quantity > 0):#in stock list
                 grocery.quantity += int(body['quantity'])
             else:
                 grocery.quantity = int(body['quantity'])
         except:
             #new grocery
-            grocery = GroceryItem(  name=body['grocery'],
+            grocery_name = body['grocery'].replace(' - ',' ')
+            grocery = GroceryItem(  name=grocery_name,
                                     category='misc',
                                     quantity=extractNum(body['quantity']))
         grocery.save()
@@ -130,7 +143,8 @@ def remove_stock(request):
     if(('quantity' in body) and ('grocery' in body)):
         try:
             #known grocery
-            grocery = GroceryItem.objects.get(name=body['grocery'])
+            grocery_name = body['grocery'].replace(' - ',' ')
+            grocery = GroceryItem.objects.get(name=grocery_name)
             quant = int(body['quantity'])
             if(grocery.quantity > 0):#in stock list
                 if(quant <= grocery.quantity):
@@ -152,14 +166,16 @@ def add_grocery(request):
     if(('quantity' in body) and ('grocery' in body)):
         try:
             #known grocery
-            grocery = GroceryItem.objects.get(name=body['grocery'])
+            grocery_name = body['grocery'].replace(' - ',' ')
+            grocery = GroceryItem.objects.get(name=grocery_name)
             if(grocery.quantity < 0):#in grocery list
                 grocery.quantity -= int(body['quantity'])
             else:#remove from stock and add to grocery list
                 grocery.quantity = -1*int(body['quantity'])
         except:
             #new grocery
-            grocery = GroceryItem(  name=body['grocery'],
+            grocery_name = body['grocery'].replace(' - ',' ')
+            grocery = GroceryItem(  name=grocery_name,
                                     category='misc',
                                     quantity=-1*extractNum(body['quantity']))
         grocery.save()
@@ -169,7 +185,6 @@ def add_grocery(request):
 def remove_grocery(request):
     if(request.method == 'GET'):
         return render(request,"assistant/grocery.html")
-    print(request.POST)
     if(('quantity' in request.POST) and ('grocery' in request.POST)):
         if(int(request.POST['quantity']) == 0):
             grocery = GroceryItem.objects.get(name=request.POST['grocery'])
@@ -181,7 +196,8 @@ def remove_grocery(request):
     if(('quantity' in body) and ('grocery' in body)):
         try:
             #known grocery
-            grocery = GroceryItem.objects.get(name=body['grocery'])
+            grocery_name = body['grocery'].replace(' - ',' ')
+            grocery = GroceryItem.objects.get(name=grocery_name)
             quant = int(body['quantity'])
             if(grocery.quantity < 0):#in grocery list
                 if(quant <= abs(grocery.quantity)):
@@ -236,3 +252,100 @@ def login_action(request):
                             password=form.cleaned_data['password'])
     login(request,new_user)
     return redirect(reverse('cookbook'))
+
+def select_recipe(request):
+    json_response = []
+    list_obj = {}
+    if('recipe' in request.POST):
+        recipe = RecipeItem.objects.get(shortname=request.POST['recipe'])
+        list_obj['name'] = recipe.name
+        list_obj['shortname'] = recipe.shortname
+        list_obj['category'] = recipe.category
+        ingredients = []
+        for ingredient in recipe.ingredients.all():
+            ingredients.append(ingredient.name)
+        list_obj['ingredients'] = ingredients
+        options = []
+        for option in recipe.optional_ingredients.all():
+            options.append(option.name)
+        list_obj['options'] = options
+    json_response.append(list_obj)
+    response_json = json.dumps(json_response)
+    response = HttpResponse(response_json, content_type='application/json')
+    return response
+
+def edit_recipe(request):
+    context = {}
+    if(request.method == 'GET'):
+        return render(request,"assistant/edit.html", context)
+    if('recipe_shortname' in request.POST):
+        shortname = request.POST['recipe_shortname']
+    else:
+        return render(request,"assistant/edit.html", context)
+    if('recipe_name' in request.POST):
+        name = request.POST['recipe_name']
+    if('recipe_cat' in request.POST):
+        category = request.POST['recipe_cat'].lower()
+    if(len(RecipeItem.objects.filter(shortname=shortname)) > 0):
+        recipe = RecipeItem.objects.get(shortname=shortname)
+        if(recipe.name != name):
+            recipe.name = name
+        if(recipe.category != category):
+            recipe.category = category
+    else:
+        recipe = RecipeItem(name=name, shortname=shortname, category=category)
+        recipe.save()
+    curIngr={}
+    curOpt={}
+    for ingredient in recipe.ingredients.all():
+        curIngr[ingredient.name] = False
+    for option in recipe.optional_ingredients.all():
+        curOpt[option.name] = False
+    #add ingredients found in post
+    if('num_ingredients' in request.POST):
+        num_ingredients = int(request.POST['num_ingredients'])
+        for i in range(num_ingredients):
+            print('ingredient_input_'+str(i))
+            if('ingredient_input_'+str(i) in request.POST):
+                ingredient_name = request.POST['ingredient_input_'+str(i)]
+                if(ingredient_name[0] != ' '):
+                    ingredient_name = ' '+ingredient_name
+                ingredient_name = ingredient_name.replace('+',' ').lower()
+                if(ingredient_name in curIngr):
+                    curIngr[ingredient_name] = True
+                if(len(GroceryItem.objects.filter(name=ingredient_name)) > 0):
+                    ingredient = GroceryItem.objects.get(name=ingredient_name)
+                else:
+                    ingredient = GroceryItem(name=ingredient_name, quantity=0, category='misc')
+                    ingredient.save()
+                if(ingredient not in recipe.ingredients.all()):
+                    recipe.ingredients.add(ingredient)
+    if('num_options' in request.POST):
+        num_options = int(request.POST['num_options'])
+        for i in range(num_options):
+            if('option_input_'+str(i) in request.POST):
+                option_name = request.POST['option_input_'+str(i)]
+                if(option_name[0] != ' '):
+                    option_name = ' '+option_name
+                option_name = option_name.replace('+',' ').lower()
+                if(option_name in curOpt):
+                    curOpt[option_name] = True
+                if(len(GroceryItem.objects.filter(name=option_name)) > 0):
+                    option = GroceryItem.objects.get(name=option_name)
+                else:
+                    option = GroceryItem(name=option_name, quantity=0, category='misc')
+                    option.save()
+                if(option not in recipe.optional_ingredients.all()):
+                    recipe.optional_ingredients.add(option)
+    #remove ingredients not found in post
+    for ingrName,included in curIngr.items():
+        ingredient = GroceryItem.objects.get(name=ingrName)
+        if(not included):
+            recipe.ingredients.remove(ingredient)
+    for ingrName,included in curOpt.items():
+        ingredient = GroceryItem.objects.get(name=ingrName)
+        if(not included):
+            recipe.optional_ingredients.remove(ingredient)
+    recipe.save()
+    return edit(request)
+

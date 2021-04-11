@@ -165,6 +165,8 @@ hr{
   padding: 1%;
   color: var(--green-gray);
   border-radius: 2%;
+  display: inline-block;
+  margin: 1%;
 }
 
 .recipe_pic{
@@ -180,6 +182,12 @@ hr{
 
 .recipe_card_text{
   padding-left: 10%;
+}
+
+.recipe_list{
+  max-height: 18vh;
+  overflow: auto;
+  display: none;
 }
 
 .login-container{
@@ -201,3 +209,6 @@ hr{
   display: block;
 }
 
+.hide{
+  display: none;
+}

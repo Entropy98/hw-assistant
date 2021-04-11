@@ -8,11 +8,11 @@
       </button>
       <div id="dropdown-content" class="dropdown-content">
         {% for recipe in recipes %}
-          <h3 onclick="selectRecipe({{recipe.shortname}})" style="display: block;">{{recipe.name}}</h3>
+          <h3 onclick="selectRecipe('{{recipe.shortname}}')" style="display: block;">{{recipe.name}}</h3>
         {% endfor %}
       </div>
     </div>
-    <form class="recipe_content">
+    <form class="recipe_content" action="{% url 'edit_recipe' %}" method="POST">
       <label for="recipe_name">Name:</label>
       <input type='text' id="recipe_name" name="recipe_name" value="{{recipe.name}}">
       <br>
@@ -22,30 +22,30 @@
       <h3>Category:</h3>
       <label for="breakfast">Breakfast:</label>
       {% if recipe.category == "breakfast" %}
-        <input type='radio' id="breakfast" name="recipe_cat" value="Breakfast" checked>
+        <input type='radio' class='radio_btn' id="breakfast" name="recipe_cat" value="Breakfast" checked>
       {% else %}
-        <input type='radio' id="breakfast" name="recipe_cat" value="Breakfast">
+        <input type='radio' class='radio_btn' id="breakfast" name="recipe_cat" value="Breakfast">
       {% endif %}
       <br>
       <label for="dinner">Dinner:</label>
       {% if recipe.category == "dinner" %}
-        <input type='radio' id="dinner" name="recipe_cat" value="Dinner" checked>
+        <input type='radio' class='radio_btn' id="dinner" name="recipe_cat" value="Dinner" checked>
       {% else %}
-        <input type='radio' id="dinner" name="recipe_cat" value="Dinner">
+        <input type='radio' class='radio_btn' id="dinner" name="recipe_cat" value="Dinner">
       {% endif %}
       <br>
       <label for="cocktails">Cocktails:</label>
       {% if recipe.category == "cocktails" %}
-        <input type='radio' id="cocktails" name="recipe_cat" value="Cocktails" checked>
+        <input type='radio' class='radio_btn' id="cocktails" name="recipe_cat" value="Cocktails" checked>
       {% else %}
-        <input type='radio' id="cocktails" name="recipe_cat" value="Cocktails">
+        <input type='radio' class='radio_btn' id="cocktails" name="recipe_cat" value="Cocktails">
       {% endif %}
       <br>
       <label for="ingredients">Ingredients:</label>
       {% if recipe.category == "ingredients" %}
-        <input type='radio' id="ingredients" name="recipe_cat" value="Ingredients" checked>
+        <input type='radio' class='radio_btn' id="ingredients" name="recipe_cat" value="Ingredients" checked>
       {% else %}
-        <input type='radio' id="ingredients" name="recipe_cat" value="Ingredients">
+        <input type='radio' class='radio_btn' id="ingredients" name="recipe_cat" value="Ingredients">
       {% endif %}
       <br>
       <h3>Ingredients:</h3>
@@ -57,6 +57,7 @@
       <input type="number" id="num_options" name="num_options" min="0" max="20" value="{{recipe.optional_ingredients|length}}" onchange="updateNumOptions()">
       <br id="options_break">
       <input type='submit' value='Submit'>
+      {% csrf_token %}
     </form>
     <script>
       window.onload = "updateNumIngredients()";

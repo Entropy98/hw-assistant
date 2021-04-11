@@ -6,31 +6,31 @@
       <h1 class="recipe__container_header">{{category_name|title}}</h1>
       <div id="{{category_name}}_recipes" class="recipe_container">
         {% for recipe in category %}
-        <div id="{{recipe.name}}" class="recipe_card" style="background-image: url('{% static 'assistant/img/paper.jpg' %}')">
+        <div id="{{recipe.shortname}}" class="recipe_card" style="background-image: url('{% static 'assistant/img/paper.jpg' %}')">
             <h2 class="recipe_name">{{recipe.name}}</h2>
             <img class="recipe_pic" src="{% static 'assistant/img/thumbnails/' recipe.thumbnail %}" onerror=this.src="{% static 'assistant/img/logo.svg' %}">
-            <h3 id="{{recipe.name}}_missing" class="recipe_card_text recipe_card_missing">
-              Missing Ingredients
+            <h3 id="{{recipe.shortname}}_missing" class="recipe_card_text recipe_card_missing" onclick="toggleMissingIngr('{{recipe.shortname}}')">
+              <i class="fas fa-caret-right"></i> Missing Ingredients
             </h3>
-            <ul id="{{recipe.name}}_missing_list" class="recipe_card_text">
+            <ul id="{{recipe.shortname}}_missing_list" class="recipe_card_text recipe_list">
               {% for ingredient in recipe.missing_ingredients %}
-                <li id="{{recipe.name}}_missing_{{forloop.counter}}">{{ingredient|title}}</li>
+                <li id="{{recipe.shortname}}_missing_{{forloop.counter}}">{{ingredient|title}}</li>
               {% endfor %}
             </ul>
-            <h3 id="{{recipe.name}}_ingredients" class="recipe_card_text">
+            <h3 id="{{recipe.shortname}}_ingredients" class="recipe_card_text" onclick="toggleIngr('{{recipe.shortname}}')">
               <i class="fas fa-caret-right"></i> Ingredients
             </h3>
-            <ul id="{{recipe.name}}_ingredients_list" class="recipe_card_text">
+            <ul id="{{recipe.shortname}}_ingredients_list" class="recipe_card_text recipe_list">
               {% for ingredient in recipe.ingredients %}
-                <li id="{{recipe.name}}_ingredient_{{forloop.counter}}">{{ingredient|title}}</li>
+                <li id="{{recipe.shortname}}_ingredient_{{forloop.counter}}">{{ingredient|title}}</li>
               {% endfor %}
             </ul>
-            <h3 id="{{recipe.name}}_optional" class="recipe_card_text">
+            <h3 id="{{recipe.shortname}}_optional" class="recipe_card_text" onclick="toggleOptionalIngr('{{recipe.shortname}}')">
               <i class="fas fa-caret-right"></i> Optional Ingredients
             </h3>
-            <ul id="{{recipe.name}}_optional_list" class="recipe_card_text">
+            <ul id="{{recipe.shortname}}_optional_list" class="recipe_card_text recipe_list">
               {% for ingredient in recipe.optional_ingredients %}
-                <li id="{{recipe.name}}_optional_{{forloop.counter}}">{{ingredient|title}}</li>
+                <li id="{{recipe.shortname}}_optional_{{forloop.counter}}">{{ingredient|title}}</li>
               {% endfor %}
             </ul>
           </div>
