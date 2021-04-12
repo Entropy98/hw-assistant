@@ -5,37 +5,52 @@
     {% for category_name, category in categories.items %}
       <h1 class="recipe__container_header">{{category_name|title}}</h1>
       <div id="{{category_name}}_recipes" class="recipe_container">
-        {% for recipe in category %}
-        <div id="{{recipe.shortname}}" class="recipe_card" style="background-image: url('{% static 'assistant/img/paper.jpg' %}')">
-            <h2 class="recipe_name">{{recipe.name}}</h2>
-            <img class="recipe_pic" src="{% static 'assistant/img/thumbnails/' recipe.thumbnail %}" onerror=this.src="{% static 'assistant/img/logo.svg' %}">
-            <h3 id="{{recipe.shortname}}_missing" class="recipe_card_text recipe_card_missing" onclick="toggleMissingIngr('{{recipe.shortname}}')">
-              <i class="fas fa-caret-right"></i> Missing Ingredients
-            </h3>
-            <ul id="{{recipe.shortname}}_missing_list" class="recipe_card_text recipe_list">
-              {% for ingredient in recipe.missing_ingredients %}
-                <li id="{{recipe.shortname}}_missing_{{forloop.counter}}">{{ingredient|title}}</li>
-              {% endfor %}
-            </ul>
-            <h3 id="{{recipe.shortname}}_ingredients" class="recipe_card_text" onclick="toggleIngr('{{recipe.shortname}}')">
-              <i class="fas fa-caret-right"></i> Ingredients
-            </h3>
-            <ul id="{{recipe.shortname}}_ingredients_list" class="recipe_card_text recipe_list">
-              {% for ingredient in recipe.ingredients %}
-                <li id="{{recipe.shortname}}_ingredient_{{forloop.counter}}">{{ingredient|title}}</li>
-              {% endfor %}
-            </ul>
-            <h3 id="{{recipe.shortname}}_optional" class="recipe_card_text" onclick="toggleOptionalIngr('{{recipe.shortname}}')">
-              <i class="fas fa-caret-right"></i> Optional Ingredients
-            </h3>
-            <ul id="{{recipe.shortname}}_optional_list" class="recipe_card_text recipe_list">
-              {% for ingredient in recipe.optional_ingredients %}
-                <li id="{{recipe.shortname}}_optional_{{forloop.counter}}">{{ingredient|title}}</li>
-              {% endfor %}
-            </ul>
-          </div>
-        {% endfor %}
+        <div class="recipe_card_container">
+          <div class="cookbook_nav {{category_name}}_nav" id="{{category_name}}_nav_left"><i class="fas fa-angle-left" onclick="updateRecipes({{forloop.counter0}},'left')"></i></div>
+          {% for recipe in category %}
+          <div id="{{category_name}}_recipe_{{forloop.counter}}" class="recipe_card {{category_name}}_card" style="background-image: url('{% static 'assistant/img/paper.jpg' %}')">
+              {% if recipe.makeable %}
+                <div class="recipe_status_marker"><i class="fas fa-check"></i></div>
+              {% else %}
+                <div class="cart_btn_container recipe_status_marker">
+                  <i class="fas fa-cart-plus"></i>
+                  <i class="fas fa-caret-down"></i>
+                </div>
+              {% endif %}
+              <h2 class="recipe_name">{{recipe.name}}</h2>
+              <img class="recipe_pic" src="{% static 'assistant/img/thumbnails/' recipe.thumbnail %}" onerror=this.src="{% static 'assistant/img/logo.svg' %}">
+              <h3 id="{{recipe.shortname}}_missing" class="recipe_card_text recipe_card_missing" onclick="toggleMissingIngr('{{recipe.shortname}}')">
+                <i class="fas fa-caret-right"></i> Missing Ingredients
+              </h3>
+              <ul id="{{recipe.shortname}}_missing_list" class="recipe_card_text recipe_list">
+                {% for ingredient in recipe.missing_ingredients %}
+                  <li id="{{recipe.shortname}}_missing_{{forloop.counter}}">{{ingredient|title}}</li>
+                {% endfor %}
+              </ul>
+              <h3 id="{{recipe.shortname}}_ingredients" class="recipe_card_text" onclick="toggleIngr('{{recipe.shortname}}')">
+                <i class="fas fa-caret-right"></i> Ingredients
+              </h3>
+              <ul id="{{recipe.shortname}}_ingredients_list" class="recipe_card_text recipe_list">
+                {% for ingredient in recipe.ingredients %}
+                  <li id="{{recipe.shortname}}_ingredient_{{forloop.counter}}">{{ingredient|title}}</li>
+                {% endfor %}
+              </ul>
+              <h3 id="{{recipe.shortname}}_optional" class="recipe_card_text" onclick="toggleOptionalIngr('{{recipe.shortname}}')">
+                <i class="fas fa-caret-right"></i> Optional Ingredients
+              </h3>
+              <ul id="{{recipe.shortname}}_optional_list" class="recipe_card_text recipe_list">
+                {% for ingredient in recipe.optional_ingredients %}
+                  <li id="{{recipe.shortname}}_optional_{{forloop.counter}}">{{ingredient|title}}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endfor %}
+          <div class="cookbook_nav {{category_name}}_nav" id="{{category_name}}_nav_right"><i class="fas fa-angle-right" onclick="updateRecipes({{forloop.counter0}},'right')"></i></div>
+        </div>
       </div>
     {% endfor %}
+    <script>
+      window.onload=updateRecipes(0,'load');
+    </script>
   </div>
 {% endblock %}

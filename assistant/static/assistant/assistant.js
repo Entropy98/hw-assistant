@@ -277,6 +277,110 @@ function updateRecipe(recipe){
   }
 }
 
+
+function updateRecipes(section,direction){
+  cards = [];
+  cards.push(document.getElementsByClassName('breakfast_card'));
+  cards.push(document.getElementsByClassName('dinner_card'));
+  cards.push(document.getElementsByClassName('cocktails_card'));
+  cards.push(document.getElementsByClassName('ingredients_card'));
+
+  numcards = Math.floor(window.innerWidth*.7/Math.max(285,vh(30)));
+  switch(direction){
+    case 'right':
+      ids = ['breakfast_','dinner_','cocktails_','ingredients_']
+      largestShown = 0;
+      for(var i=0; i<cards[section].length; i++){
+        card = cards[section][i]
+        if(!card.classList.contains('hide')){
+          id = parseInt(card.id.substring((ids[section]+'recipe_').length));
+          if(id > largestShown){
+            largestShown = id;
+          }
+          card.classList.add('hide');
+        }
+      }
+      document.getElementById(ids[section]+'nav_left').classList.remove('hide')
+      document.getElementById(ids[section]+'recipes').style.paddingLeft = '0';
+      if(largestShown+numcards >= cards[section].length){
+        document.getElementById(ids[section]+'nav_right').classList.add('hide')
+      }
+      for(var i=largestShown; i<Math.min(cards[section].length,largestShown+numcards); i++){
+        cards[section][i].classList.remove('hide');
+      }
+      break;
+    case 'left':
+      ids = ['breakfast_','dinner_','cocktails_','ingredients_']
+      smallestShown = cards[section].length;
+      for(var i=0; i<cards[section].length; i++){
+        card = cards[section][i]
+        if(!card.classList.contains('hide')){
+          id = parseInt(card.id.substring((ids[section]+'recipe_').length));
+          if(id < smallestShown){
+            smallestShown = id;
+          }
+          card.classList.add('hide');
+        }
+      }
+      document.getElementById(ids[section]+'nav_right').classList.remove('hide')
+      document.getElementById(ids[section]+'recipes').style.paddingLeft = '0';
+      if(smallestShown-numcards <= 1){
+        document.getElementById(ids[section]+'nav_left').classList.add('hide')
+        document.getElementById(ids[section]+'recipes').style.paddingLeft = '3%';
+      }
+      for(var i=Math.max(0,smallestShown-1-numcards); i<smallestShown-1; i++){
+        cards[section][i].classList.remove('hide');
+      }
+      break;
+    case 'load':
+      breakfast_nav = document.getElementsByClassName('breakfast_nav');
+      breakfast_nav[0].classList.add("hide");
+      document.getElementById('breakfast_recipes').style.paddingLeft = '3%';
+      if(cards[0].length <= numcards){
+        breakfast_nav[1].classList.add("hide");
+      }
+      else{
+        for(var i=numcards; i<cards[0].length; i++){
+          cards[0][i].classList.add("hide");
+        }
+      }
+      dinner_nav = document.getElementsByClassName('dinner_nav');
+      dinner_nav[0].classList.add("hide");
+      document.getElementById('dinner_recipes').style.paddingLeft = '3%';
+      if(cards[1].length <= numcards){
+        dinner_nav[1].classList.add("hide");
+      }
+      else{
+        for(var i=numcards; i<cards[1].length; i++){
+          cards[1][i].classList.add("hide");
+        }
+      }
+      cocktails_nav = document.getElementsByClassName('cocktails_nav');
+      cocktails_nav[0].classList.add("hide");
+      document.getElementById('cocktails_recipes').style.paddingLeft = '3%';
+      if(cards[2].length <= numcards){
+        cocktails_nav[1].classList.add("hide");
+      }
+      else{
+        for(var i=numcards; i<cards[2].length; i++){
+          cards[2][i].classList.add("hide");
+        }
+      }
+      ingredients_nav = document.getElementsByClassName('ingredients_nav');
+      ingredients_nav[0].classList.add("hide");
+      document.getElementById('ingredients_recipes').style.paddingLeft = '3%';
+      if(cards[3].length <= numcards){
+        ingredients_nav[1].classList.add("hide");
+      }
+      else{
+        for(var i=numcards; i<cards[3].length; i++){
+          cards[3][i].classList.add("hide");
+        }
+      }
+      break;
+  }
+}
+
 function getCSRFToken(){
   let cookies = document.cookie.split(";")
   for (let i=0; i< cookies.length; i++){
@@ -288,3 +392,7 @@ function getCSRFToken(){
   return "unknown"
 }
 
+function vh(v) {
+  var h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+  return (v * h) / 100;
+}
