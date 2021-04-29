@@ -173,15 +173,17 @@ function updateLists(lists){
         checklist = '<ul id="'+list_id+'">'
         for(var j=0; j<items.length; j++){
           let item = items[j];
-          let quantity = this[category][item]
+          let name = this[category][item]['name']
+          let quantity = this[category][item]['quantity']
+          let unit = this[category][item]['unit']
           if(quantity < 0){
             checklist +=  '<hr>'+
                           '<li id="'+category+'-item-'+j+'">'+
-                            formatItem(item) +' x'+ (-1*quantity) + '  '+
+                            formatItem(name) +' x'+ (-1*quantity) + unit + '  '+
                             '<i onclick="removeItem(this)" class="far fa-times-circle remove-btn"'+
-                            'id="remove-'+formatItemId(item)+'"></i>'+
+                            'id="remove-'+formatItemId(name)+'"></i>'+
                             '<i onclick="storeItem(this)" class="far fa-check-circle store-btn"'+
-                            'id="store-'+formatItemId(item)+'"></i>'+
+                            'id="store-'+formatItemId(name)+'"></i>'+
                           '</li>';
           }
         }
@@ -194,15 +196,17 @@ function updateLists(lists){
         checklist = '<ul id="'+list_id+'">'
         for(var j=0; j<items.length; j++){
           let item = items[j];
-          let quantity = this[category][item]
+          let name = this[category][item]['name']
+          let quantity = this[category][item]['quantity']
+          let unit = this[category][item]['unit']
           if(quantity > 0){
             checklist +=  '<hr>'+
                           '<li id="'+category+'-item-'+j+'">'+
-                            formatItem(item) +' x'+ quantity +'  '+
+                            formatItem(name) +' x'+ quantity + unit + '  '+
                             '<i onclick="removeItem(this)" class="far fa-times-circle remove-btn"'+
-                            'id="remove-'+formatItemId(item)+'"></i>'+
+                            'id="remove-'+formatItemId(name)+'"></i>'+
                             '<i onclick="repeatItem(this)" class="fas fa-redo buy-again-btn"'+
-                            'id="buy-again-'+formatItemId(item)+'"></i>'+
+                            'id="buy-again-'+formatItemId(name)+'"></i>'+
                           '</li>';
           }
         }
@@ -244,6 +248,8 @@ function formatItemId(item){
 function updateNumIngredients(){
   numIngr = document.getElementById('num_ingredients').value;
   ingredients = document.getElementsByClassName('ingredient_input');
+  quants = document.getElementsByClassName('ingredient_quant_input');
+  units = document.getElementsByClassName('ingredient_unit_input');
   ingrBreaks = document.getElementsByClassName('ingredient_br');
   prevNumIngr = -1;
   for(var i=0; i<ingredients.length; i++){
@@ -254,12 +260,18 @@ function updateNumIngredients(){
   }
   while(ingredients.length>numIngr){
     ingredients[0].remove();
+    quants[0].remove();
+    units[0].remove();
     ingrBreaks[0].remove();
   }
   input = '';
   for(var i=prevNumIngr+1; i<numIngr; i++){
-    input +=  '<input type="text" class="ingredient_input" id="ingredient_input_'+i+'" name="ingredient_input_'+i+'">'+
-              '<br class="ingredient_br">';
+    input +='<div>'+
+              '<input type="text" class="ingredient_input" id="ingredient_input_'+i+'" name="ingredient_input_'+i+'" style="display: inline-block;">'+
+              '<input type="number" class="ingredient_quant_input" id="ingredient_quant_input_'+i+'" name="ingredient_quant_input_'+i+'" style="display: inline-block;">'+
+              '<input type="text" class="ingredient_unit_input" id="ingredient_unit_input_'+i+'" name="ingredient_unit_input_'+i+'" style="display: inline-block;">'+
+            '</div>'+
+            '<br class="ingredient_br">';
   }
   $('#ingredients_break').after(input);
 }
@@ -313,7 +325,9 @@ function updateRecipe(recipe){
   updateNumIngredients();
   updateNumOptions();
   for(var i=0; i<data.ingredients.length; i++){
-    document.getElementById('ingredient_input_'+i).value = data.ingredients[i];
+    document.getElementById('ingredient_input_'+i).value = data.ingredients[i].name;
+    document.getElementById('ingredient_quant_input_'+i).value = data.ingredients[i].quantity;
+    document.getElementById('ingredient_unit_input_'+i).value = data.ingredients[i].unit;
   }
   for(var i=0; i<data.options.length; i++){
     document.getElementById('option_input_'+i).value = data.options[i];

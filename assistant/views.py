@@ -6,6 +6,7 @@ from django.urls import reverse
 
 from assistant.models import *
 from assistant.forms import *
+from assistant.unit_conv import *
 
 import json
 # Create your views here.
@@ -55,36 +56,44 @@ def cookbook(request):
             planned_ingredients = []
             ingredients = []
             for ingr in recipe.ingredients.all():
-                ingredients.append(ingr.name)
+                ingr_obj = {'name':ingr.name}
+                if(len(recipe.ingr_quants.filter(name=ingr.name))>0):
+                    ingrItem = recipe.ingr_quants.get(name=ingr.name)
+                    ingr_obj['quantity'] = ingrItem.quantity
+                    ingr_obj['unit'] = ingrItem.units
+                else:
+                    ingr_obj['quantity'] = 1
+                    ingr_obj['unit'] = ''
+                ingredients.append(ingr_obj)
                 if(ingr.quantity == 0 and ingr.name!=' water'):
                     if(len(RecipeItem.objects.filter(name=(ingr.name[1:].lower())))>0):
                         home_ingr = RecipeItem.objects.get(name=(ingr.name[1:].lower()))
                         for home_ingr_ingr in home_ingr.ingredients.all():
                             if(home_ingr_ingr.quantity == 0 and home_ingr_ingr.name!=' water'):
-                                missing_ingredients.append(ingr.name)
+                                missing_ingredients.append(ingr_obj)
                                 makeable = False
                                 break;
                             elif(home_ingr_ingr.quantity < 1 and home_ingr_ingr.name!=' water'):
-                                planned_ingredients.append(ingr.name)
+                                planned_ingredients.append(ingr_obj)
                                 makeable = False
                                 break;
                     else:
-                        missing_ingredients.append(ingr.name)
+                        missing_ingredients.append(ingr_obj)
                         makeable = False
                 elif(ingr.quantity < 1 and ingr.name!=' water'):
                     if(len(RecipeItem.objects.filter(name=(ingr.name[1:].lower())))>0):
                         home_ingr = RecipeItem.objects.get(name=(ingr.name[1:].lower()))
                         for home_ingr_ingr in home_ingr.ingredients.all():
                             if(home_ingr_ingr.quantity == 0 and home_ingr_ingr.name!=' water'):
-                                missing_ingredients.append(ingr.name)
+                                missing_ingredients.append(ingr_obj)
                                 makeable = False
                                 break;
                             elif(home_ingr_ingr.quantity < 1 and home_ingr_ingr.name!=' water'):
-                                planned_ingredients.append(ingr.name)
+                                planned_ingredients.append(ingr_obj)
                                 makeable = False
                                 break;
                     else:
-                        planned_ingredients.append(ingr.name)
+                        planned_ingredients.append(ingr_obj)
                         makeable = False
 
                 if(ingr.gluten):
@@ -168,9 +177,9 @@ def add_single_stock(request):
             grocery_name = body['grocery'].replace(' - ',' ')
             grocery = GroceryItem.objects.get(name=grocery_name)
             if(grocery.quantity > 0):#in stock list
-                grocery.quantity += grocery.default_quant)
+                grocery.quantity += grocery.default_quant
             else:
-                grocery.quantity = grocery.default_quant)
+                grocery.quantity = grocery.default_quant
         except:
             #new grocery
             grocery_name = body['grocery'].replace(' - ',' ')
@@ -288,7 +297,11 @@ def update_lists(request):
         list_type_obj={}
         for grocery in GroceryItem.objects.filter(category=list_type):
             if(grocery.quantity != 0):
-                list_type_obj[grocery.name] = grocery.quantity
+                grocery_obj={   'name':grocery.name,
+                                'quantity':grocery.quantity,
+                                'unit':grocery.units,
+                            }
+                list_type_obj[grocery.name] = grocery_obj
         if(len(list_type_obj) > 0):
             list_obj[list_type] = list_type_obj
     json_response.append(list_obj)
@@ -334,7 +347,15 @@ def select_recipe(request):
         list_obj['category'] = recipe.category
         ingredients = []
         for ingredient in recipe.ingredients.all():
-            ingredients.append(ingredient.name)
+            ingrObj = {'name':ingredient.name}
+            if(len(recipe.ingr_quants.filter(name=ingredient.name))>0):
+                ingrItem = recipe.ingr_quants.get(name=ingredient.name)
+                ingrObj['quantity'] = ingrItem.quantity
+                ingrObj['unit'] = ingrItem.units
+            else:
+                ingrObj['quantity'] = 1
+                ingrObj['unit'] = ''
+            ingredients.append(ingrObj)
         list_obj['ingredients'] = ingredients
         options = []
         for option in recipe.optional_ingredients.all():
@@ -407,6 +428,21 @@ def edit_recipe(request):
                     ingredient.save()
                 if(ingredient not in recipe.ingredients.all()):
                     recipe.ingredients.add(ingredient)
+            if('ingredient_quant_input_'+str(i) in request.POST):
+                quant = request.POST['ingredient_quant_input_'+str(i)]
+            if('ingredient_unit_input_'+str(i) in request.POST):
+                unit = request.POST['ingredient_unit_input_'+str(i)]
+            if(len(recipe.ingr_quants.filter(name=ingredient_name))>0):
+                ingritem = recipe.ingr_quants.get(name=ingredient_name)
+                if(ingritem.quantity != quant):
+                    ingritem.quantity = quant
+                if(ingritem.units != unit):
+                    ingritem.units = unit
+                ingritem.save()
+            else:
+                ingritem = IngredientItem(name=ingredient_name,quantity=quant,units=unit)
+                ingritem.save()
+                recipe.ingr_quants.add(ingritem)
     if('num_options' in request.POST):
         num_options = int(request.POST['num_options'])
         for i in range(num_options):
@@ -486,16 +522,22 @@ def buy_recipe(request):
     if('recipe' in request.POST):
         recipe = RecipeItem.objects.get(shortname=request.POST['recipe'])
     for ingr in recipe.ingredients.all():
-        if(ingr.quantity == 0 and ingr.name!=' water'):
+        if(ingr.quantity < 1 and ingr.name!=' water'):
+            delta_quant = 1
+            delta_unit = ''
+            if(len(recipe.ingr_quants.filter(name=ingr.name))>0):
+                ingrItem = recipe.ingr_quants.get(name=ingr.name)
+                delta_quant = ingrItem.quantity
+                delta_unit = ingrItem.units
             if(len(RecipeItem.objects.filter(name=(ingr.name[1:].lower())))>0):
                 home_ingr = RecipeItem.objects.get(name=(ingr.name[1:].lower()))
                 for home_ingr_ingr in home_ingr.ingredients.all():
                     if(home_ingr_ingr.quantity == 0 and home_ingr_ingr.name!=' water'):
-                        ingr.quantity = ingr.default_quant*-1
+                        ingr.quantity = ingr.quantity - convert(delta_quant,delta_unit,ingr.units)
                         ingr.save()
                         break;
             else:
-                ingr.quantity = ingr.default_quant*-1
+                ingr.quantity = ingr.quantity - convert(delta_quant,delta_unit,ingr.units)
                 ingr.save()
 
     for i in range(len(ingr.optional_ingredients.all())):

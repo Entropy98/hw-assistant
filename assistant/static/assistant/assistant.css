@@ -252,6 +252,7 @@ input:checked + .slidertf{
   max-height: 6vh;
   overflow: auto;
   display: none;
+  padding-left: 20%;
 }
 
 .cookbook_nav{
@@ -336,6 +337,14 @@ input:checked + .slidertf{
 
 .dropdown_ingredient{
   display: none;
+}
+
+.ingredient_quant_input{
+  width: 40px;
+}
+
+.ingredient_unit_input{
+  width: 60px;
 }
 
 .show{

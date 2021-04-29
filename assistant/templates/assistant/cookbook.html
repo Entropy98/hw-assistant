@@ -46,10 +46,14 @@
               </h3>
               <ul id="{{recipe.shortname}}_missing_list" class="recipe_card_text recipe_list">
                 {% for ingredient in recipe.missing_ingredients %}
-                  <li id="{{recipe.shortname}}_missing_{{forloop.counter}}">{{ingredient|title}}</li>
+                <li id="{{recipe.shortname}}_missing_{{forloop.counter}}">
+                  {{ingredient.name|title}} x{{ingredient.quantity}} {{ingredient.unit}}
+                </li>
                 {% endfor %}
                 {% for ingredient in recipe.planned_ingredients %}
-                  <li id="{{recipe.shortname}}_missing_{{forloop.counter}}" style="color: var(--light-tan);">{{ingredient|title}}</li>
+                  <li id="{{recipe.shortname}}_missing_{{forloop.counter}}" style="color: var(--light-tan);">
+                    {{ingredient.name|title}} x{{ingredient.quantity}} {{ingredient.unit}}
+                  </li>
                 {% endfor %}
               </ul>
               </ul>
@@ -58,7 +62,9 @@
               </h3>
               <ul id="{{recipe.shortname}}_ingredients_list" class="recipe_card_text recipe_list">
                 {% for ingredient in recipe.ingredients %}
-                  <li id="{{recipe.shortname}}_ingredient_{{forloop.counter}}">{{ingredient|title}}</li>
+                  <li id="{{recipe.shortname}}_ingredient_{{forloop.counter}}">
+                    {{ingredient.name|title}} x{{ingredient.quantity}} {{ingredient.unit}}
+                  </li>
                 {% endfor %}
               </ul>
               <h3 id="{{recipe.shortname}}_optional" class="recipe_card_text" onclick="toggleOptionalIngr('{{recipe.shortname}}')">
