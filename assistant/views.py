@@ -11,7 +11,7 @@ import json
 # Create your views here.
 
 #categories of lists
-lists=['produce','alcohol','pantry','dairy','misc']
+lists=['produce','alcohol','pantry','dairy','spices','misc']
 recipe_cats=['breakfast','dinner','cocktails','ingredients']
 
 def grocery(request):
@@ -378,15 +378,32 @@ def buy_recipe(request):
     if('recipe' in request.POST):
         recipe = RecipeItem.objects.get(shortname=request.POST['recipe'])
     for ingr in recipe.ingredients.all():
-        if(ingr.quantity == 0):
-            ingr.quantity = ingr.default_quant*-1
-            ingr.save()
+        if(ingr.quantity == 0 and ingr.name!=' water'):
+            if(len(RecipeItem.objects.filter(name=(ingr.name[1:].lower())))>0):
+                home_ingr = RecipeItem.objects.get(name=(ingr.name[1:].lower()))
+                for home_ingr_ingr in home_ingr.ingredients.all():
+                    if(home_ingr_ingr.quantity == 0 and home_ingr_ingr.name!=' water'):
+                        ingr.quantity = ingr.default_quant*-1
+                        ingr.save()
+                        break;
+            else:
+                ingr.quantity = ingr.default_quant*-1
+                ingr.save()
+
     for i in range(len(ingr.optional_ingredients.all())):
         if('optional'+str(i) in request.POST):
             ingr = recipe.optional_ingredients.get(name=(request.POST['optional'+str(i)].replace('_',' ')))
-            if(ingr.quantity == 0):
-                ingr.quantity = ingr.default_quant*-1
-                ingr.save()
+            if(ingr.quantity == 0 and ingr.name != 'water'):
+                if(len(RecipeItem.objects.filter(name=(ingr.name[1:].lower())))>0):
+                    home_ingr = RecipeItem.objects.get(name=(ingr.name[1:].lower()))
+                    for home_ingr_ingr in home_ingr.ingredients.all():
+                        if(home_ingr_ingr.quantity == 0 and home_ingr_ingr.name!=' water'):
+                            ingr.quantity = ingr.default_quant*-1
+                            ingr.save()
+                            break;
+                else:
+                    ingr.quantity = ingr.default_quant*-1
+                    ingr.save()
     response_json = json.dumps([])
     response = HttpResponse(response_json, content_type='application/json')
     return response

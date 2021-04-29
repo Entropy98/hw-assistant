@@ -89,7 +89,7 @@ function addRecipeIngredients(recipe){
     type: 'POST',
     data: 'recipe='+recipe+checked,
     dataType: 'json',
-    success: chooseRecipeOptionals(recipe),
+    success: document.getElementById(recipe+"_optional_dropdown").classList.remove("show"),
     error: updateError
   });
 }

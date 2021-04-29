@@ -264,8 +264,15 @@ hr{
   padding-left: 2rem;
 }
 
+.dropdownbtn{
+  position: relative;
+}
+
 .dropdown-content{
   display: none;
+  position: absolute;
+  z-index: 1;
+  background-color: var(--green-gray);
 }
 
 .show{
