@@ -11,10 +11,32 @@
           <div id="{{category_name}}_recipe_{{forloop.counter}}" class="recipe_card {{category_name}}_card" style="background-image: url('{% static 'assistant/img/paper.jpg' %}')">
               {% if recipe.makeable %}
                 <div class="recipe_status_marker"><i class="fas fa-check"></i></div>
+              {% elif recipe.missing_ingredients|length == 0 %}
+                <div class="recipe_status_marker"><i class="fas fa-shopping-cart" style="color:var(--orange);"></i></div>
               {% else %}
                 <div class="cart_btn_container recipe_status_marker">
-                  <i class="fas fa-cart-plus"></i>
-                  <i class="fas fa-caret-down"></i>
+                  <div class="cart_btn" onclick="addRecipeIngredients('{{recipe.shortname}}')">
+                    <i class="fas fa-cart-plus"></i>
+                  </div>
+                  <div class="cart_btn" onclick="chooseRecipeOptionals('{{recipe.shortname}}')">
+                    <i class="fas fa-caret-down"></i>
+                  </div>
+                <div class="recipe_optional_dropdown" id="{{recipe.shortname}}_optional_dropdown">
+                  {% if recipe.optional_ingredients|length > 0 %}
+                    <ul>
+                      {% for ingredient in recipe.optional_ingredients %}
+                        <li class="recipe_optional_text" id="recipe_optional_dropdown_item_{{forloop.counter}}">
+                          <input type="checkbox" class="{{recipe.shortname}}_optional_check" name="{{recipe.shortname}}_optional_check_{{forloop.counter}}" value="{{ingredient}}">
+                          <label for="{{recipe.shortname}}_optional_check_{{forloop.counter}}">
+                            {{ingredient|title}}
+                          </label>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <h3 class="recipe_optional_text" style="font-style: italic;">No Optional Ingredients</h3>
+                  {% endif %}
+                </div>
                 </div>
               {% endif %}
               <h2 class="recipe_name">{{recipe.name}}</h2>
@@ -26,6 +48,10 @@
                 {% for ingredient in recipe.missing_ingredients %}
                   <li id="{{recipe.shortname}}_missing_{{forloop.counter}}">{{ingredient|title}}</li>
                 {% endfor %}
+                {% for ingredient in recipe.planned_ingredients %}
+                  <li id="{{recipe.shortname}}_missing_{{forloop.counter}}" style="color: var(--light-tan);">{{ingredient|title}}</li>
+                {% endfor %}
+              </ul>
               </ul>
               <h3 id="{{recipe.shortname}}_ingredients" class="recipe_card_text" onclick="toggleIngr('{{recipe.shortname}}')">
                 <i class="fas fa-caret-right"></i> Ingredients

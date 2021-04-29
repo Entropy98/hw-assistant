@@ -35,4 +35,5 @@ urlpatterns = [
     path('login', views.login_action, name='login'),
     path('select_recipe', views.select_recipe),
     path('edit_recipe', views.edit_recipe, name='edit_recipe'),
+    path('buy_recipe',views.buy_recipe, name='buy_recipe'),
 ]

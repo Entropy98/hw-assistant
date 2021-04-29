@@ -220,6 +220,37 @@ hr{
   color: var(--off-white);
   padding: 1%;
   border-radius: 10%;
+  position: relative;
+}
+
+.cart_btn{
+  display: inline-block;
+}
+
+.cart_btn:hover{
+  color: var(--light-tan);
+}
+
+.recipe_optional_dropdown{
+  display:none;
+  position: absolute;
+  z-index: 1;
+  left: -400%;
+  background-color: inherit;
+  width: 540%;
+  border-radius: 5%;
+}
+
+.recipe_optional_dropdown > ul{
+  padding-left: 5%;
+}
+
+.recipe_optional_dropdown > h3{
+  padding-left: 5%;
+}
+
+.recipe_optional_text{
+  list-style-type: none;
 }
 
 .login-container{

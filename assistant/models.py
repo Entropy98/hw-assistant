@@ -6,6 +6,8 @@ class GroceryItem(models.Model):
     category = models.CharField(max_length=50)
     gluten = models.BooleanField(default=False)
     dairy = models.BooleanField(default=False)
+    default_quant = models.IntegerField(default=1)
+    units = models.CharField(default='',max_length=10)
 
 class RecipeItem(models.Model):
     name = models.CharField(max_length=50)

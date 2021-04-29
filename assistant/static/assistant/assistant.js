@@ -32,6 +32,10 @@ function toggleOptionalIngr(recipe){
   document.getElementById(recipe+"_optional_list").classList.toggle("show");
 }
 
+function chooseRecipeOptionals(recipe){
+  document.getElementById(recipe+"_optional_dropdown").classList.toggle("show");
+}
+
 function removeItem(item){
   let name = item.id.substring("remove-".length);
   name = ' '+name.replaceAll('-',' ');
@@ -67,6 +71,25 @@ function repeatItem(item){
     data: 'grocery='+name+'&quantity=0',
     dataType: 'json',
     success: updateLists,
+    error: updateError
+  });
+}
+
+function addRecipeIngredients(recipe){
+  optionals = document.getElementsByClassName(recipe+"_optional_check");
+  let checked='';
+  for(var i=0; i<optionals.length; i++){
+    ingr = optionals[i]
+    if(ingr.checked){
+      checked += '&optional'+i+'='+ingr.value.replaceAll(' ','_');
+    }
+  }
+  $.ajax({
+    url: '/buy_recipe',
+    type: 'POST',
+    data: 'recipe='+recipe+checked,
+    dataType: 'json',
+    success: chooseRecipeOptionals(recipe),
     error: updateError
   });
 }

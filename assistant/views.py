@@ -52,19 +52,39 @@ def cookbook(request):
             gluten = False
             dairy = False
             missing_ingredients = []
+            planned_ingredients = []
             ingredients = []
             for ingr in recipe.ingredients.all():
                 ingredients.append(ingr.name)
-                if(ingr.quantity < 1 and ingr.name!=' water'):
+                if(ingr.quantity == 0 and ingr.name!=' water'):
                     if(len(RecipeItem.objects.filter(name=(ingr.name[1:].lower())))>0):
                         home_ingr = RecipeItem.objects.get(name=(ingr.name[1:].lower()))
                         for home_ingr_ingr in home_ingr.ingredients.all():
-                            if(home_ingr_ingr.quantity < 1 and home_ingr_ingr.name!=' water'):
+                            if(home_ingr_ingr.quantity == 0 and home_ingr_ingr.name!=' water'):
                                 missing_ingredients.append(ingr.name)
+                                makeable = False
+                                break;
+                            elif(home_ingr_ingr.quantity < 1 and home_ingr_ingr.name!=' water'):
+                                planned_ingredients.append(ingr.name)
                                 makeable = False
                                 break;
                     else:
                         missing_ingredients.append(ingr.name)
+                        makeable = False
+                if(ingr.quantity < 1 and ingr.name!=' water'):
+                    if(len(RecipeItem.objects.filter(name=(ingr.name[1:].lower())))>0):
+                        home_ingr = RecipeItem.objects.get(name=(ingr.name[1:].lower()))
+                        for home_ingr_ingr in home_ingr.ingredients.all():
+                            if(home_ingr_ingr.quantity == 0 and home_ingr_ingr.name!=' water'):
+                                missing_ingredients.append(ingr.name)
+                                makeable = False
+                                break;
+                            elif(home_ingr_ingr.quantity < 1 and home_ingr_ingr.name!=' water'):
+                                planned_ingredients.append(ingr.name)
+                                makeable = False
+                                break;
+                    else:
+                        planned_ingredients.append(ingr.name)
                         makeable = False
 
                 if(ingr.gluten):
@@ -76,6 +96,7 @@ def cookbook(request):
             recipe_obj['dairy'] = dairy
             recipe_obj['ingredients'] = ingredients
             recipe_obj['missing_ingredients'] = missing_ingredients
+            recipe_obj['planned_ingredients'] = planned_ingredients
             optional_ingredients = []
             for ingr in recipe.optional_ingredients.all():
                 optional_ingredients.append(ingr.name)
@@ -349,3 +370,23 @@ def edit_recipe(request):
     recipe.save()
     return edit(request)
 
+@csrf_exempt
+def buy_recipe(request):
+    context = {}
+    if(request.method == 'GET'):
+        return render(request,"assistant/cookbook.html", context)
+    if('recipe' in request.POST):
+        recipe = RecipeItem.objects.get(shortname=request.POST['recipe'])
+    for ingr in recipe.ingredients.all():
+        if(ingr.quantity == 0):
+            ingr.quantity = ingr.default_quant*-1
+            ingr.save()
+    for i in range(len(ingr.optional_ingredients.all())):
+        if('optional'+str(i) in request.POST):
+            ingr = recipe.optional_ingredients.get(name=(request.POST['optional'+str(i)].replace('_',' ')))
+            if(ingr.quantity == 0):
+                ingr.quantity = ingr.default_quant*-1
+                ingr.save()
+    response_json = json.dumps([])
+    response = HttpResponse(response_json, content_type='application/json')
+    return response
