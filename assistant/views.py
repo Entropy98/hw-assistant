@@ -71,7 +71,7 @@ def cookbook(request):
                     else:
                         missing_ingredients.append(ingr.name)
                         makeable = False
-                if(ingr.quantity < 1 and ingr.name!=' water'):
+                elif(ingr.quantity < 1 and ingr.name!=' water'):
                     if(len(RecipeItem.objects.filter(name=(ingr.name[1:].lower())))>0):
                         home_ingr = RecipeItem.objects.get(name=(ingr.name[1:].lower()))
                         for home_ingr_ingr in home_ingr.ingredients.all():
