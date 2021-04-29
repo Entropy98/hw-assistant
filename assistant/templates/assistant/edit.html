@@ -2,17 +2,28 @@
 {% load static %}
 {% block content %}
   <div class="content">
+    <div>
+      <h2 style="display:inline-block;">Recipes</h2>
+      <label class="switch" style="display:inline-block;">
+        <input type="checkbox" id="dropdown_select" onchange="toggleDropdownContent()">
+        <span class="slider round"></span>
+      </label>
+      <h2 style="display:inline-block;">Ingredients</h2>
+    </div>
     <div class="dropdown">
       <button onclick="showDropdown()" class="dropdownbtn">
         <i class="fas fa-caret-down"></i>
       </button>
       <div id="dropdown-content" class="dropdown-content">
         {% for recipe in recipes %}
-          <h3 onclick="selectRecipe('{{recipe.shortname}}')" style="display: block;">{{recipe.name}}</h3>
+          <h3 onclick="selectRecipe('{{recipe.shortname}}')" class="dropdown_edit_item">{{recipe.name}}</h3>
+        {% endfor %}
+        {% for ingredient in ingredients %}
+          <h3 onclick="selectIngredient('{{ingredient.name}}')" class="dropdown_edit_item hide">{{ingredient.name}}</h3>
         {% endfor %}
       </div>
     </div>
-    <form class="recipe_content" action="{% url 'edit_recipe' %}" method="POST">
+    <form class="recipe_content edit_form" action="{% url 'edit_recipe' %}" method="POST">
       <label for="recipe_name">Name:</label>
       <input type='text' id="recipe_name" name="recipe_name" value="{{recipe.name}}">
       <br>
@@ -56,6 +67,78 @@
       <label for="num_options">Number of Optional Ingredients:</label>
       <input type="number" id="num_options" name="num_options" min="0" max="20" value="{{recipe.optional_ingredients|length}}" onchange="updateNumOptions()">
       <br id="options_break">
+      <input type='submit' value='Submit'>
+      {% csrf_token %}
+    </form>
+    <form class="ingredient_content edit_form hide" action="{% url 'edit_ingredient' %}" method="POST">
+      <label for="ingredient_name">Name:</label>
+      <input type="text" id="ingredient_name" name="ingredient_name" value="{{ingredient.name}}">
+      <br>
+      <h3>Category:</h3>
+      <label for="produce">Produce:</label>
+      {% if ingredient.category == "produce" %}
+        <input type='radio' class='radio_btn' id="produce" name="ingr_cat" value="Produce" checked>
+      {% else %}
+        <input type='radio' class='radio_btn' id="produce" name="ingr_cat" value="Produce">
+      {% endif %}
+      <br>
+      <label for="alcohol">Alcohol:</label>
+      {% if ingredient.category == "alcohol" %}
+        <input type='radio' class='radio_btn' id="alcohol" name="ingr_cat" value="Alcohol" checked>
+      {% else %}
+        <input type='radio' class='radio_btn' id="alcohol" name="ingr_cat" value="Alcohol">
+      {% endif %}
+      <br>
+      <label for="pantry">Pantry:</label>
+      {% if ingredient.category == "pantry" %}
+        <input type='radio' class='radio_btn' id="pantry" name="ingr_cat" value="Pantry" checked>
+      {% else %}
+        <input type='radio' class='radio_btn' id="pantry" name="ingr_cat" value="Pantry">
+      {% endif %}
+      <br>
+      <label for="dairy">Dairy:</label>
+      {% if ingredient.category == "dairy" %}
+        <input type='radio' class='radio_btn' id="dairy" name="ingr_cat" value="Dairy" checked>
+      {% else %}
+        <input type='radio' class='radio_btn' id="dairy" name="ingr_cat" value="Dairy">
+      {% endif %}
+      <br>
+      <label for="spices">Spices:</label>
+      {% if ingredient.category == "spices" %}
+        <input type='radio' class='radio_btn' id="spices" name="ingr_cat" value="Spices" checked>
+      {% else %}
+        <input type='radio' class='radio_btn' id="spices" name="ingr_cat" value="Spices">
+      {% endif %}
+      <br>
+      <label for="misc">Misc:</label>
+      {% if ingredient.category == "misc" %}
+        <input type='radio' class='radio_btn' id="misc" name="ingr_cat" value="Misc" checked>
+      {% else %}
+        <input type='radio' class='radio_btn' id="misc" name="ingr_cat" value="Misc">
+      {% endif %}
+      <br>
+      <div>
+        <h4 style="display:inline-block;">Gluten</h4>
+        <label class="switch" style="display:inline-block;">
+          <input type="checkbox" id="ingredient_gluten" name="ingredient_gluten">
+          <span class="slider round slidertf"></span>
+        </label>
+      </div>
+      <br>
+      <div>
+        <h4 style="display:inline-block;">Dairy</h4>
+        <label class="switch" style="display:inline-block;">
+          <input type="checkbox" id="ingredient_dairy" name="ingredient_dairy">
+          <span class="slider round slidertf"></span>
+        </label>
+      </div>
+      <br>
+      <label for="ingredient_default_quant">Default Quantity:</label>
+      <input type="number" id="ingredient_default_quant" name="ingredient_default_quant" value="{{ingredient.default_quant}}">
+      <br>
+      <label for="ingredient_units">Units:</label>
+      <input type="text" id="ingredient_units" name="ingredient_units" value="{{ingredient.units}}">
+      <br>
       <input type='submit' value='Submit'>
       {% csrf_token %}
     </form>

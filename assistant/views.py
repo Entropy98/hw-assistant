@@ -113,7 +113,8 @@ def edit(request):
     context={}
     if(request.user.is_authenticated):
         context['username'] = request.user.username
-    context['recipes'] = RecipeItem.objects.all()
+    context['recipes'] = RecipeItem.objects.all().order_by('name')
+    context['ingredients'] = GroceryItem.objects.all().order_by('name')
     if(request.method == 'GET'):
         return render(request,"assistant/edit.html", context)
     return render(request,"assistant/edit.html", context)
@@ -151,6 +152,31 @@ def add_stock(request):
             grocery = GroceryItem(  name=grocery_name,
                                     category='misc',
                                     quantity=extractNum(body['quantity']))
+        grocery.save()
+    return update_lists(request)
+
+@csrf_exempt
+def add_single_stock(request):
+    if(request.method == 'GET'):
+        return render(request,"assistant/grocery.html")
+    body = json.loads(request.body.decode('utf-8'))
+    for word in body:
+        word = word.replace(' ','')
+    if('grocery' in body):
+        try:
+            #known grocery
+            grocery_name = body['grocery'].replace(' - ',' ')
+            grocery = GroceryItem.objects.get(name=grocery_name)
+            if(grocery.quantity > 0):#in stock list
+                grocery.quantity += grocery.default_quant)
+            else:
+                grocery.quantity = grocery.default_quant)
+        except:
+            #new grocery
+            grocery_name = body['grocery'].replace(' - ',' ')
+            grocery = GroceryItem(  name=grocery_name,
+                                    category='misc',
+                                    quantity=1)
         grocery.save()
     return update_lists(request)
 
@@ -199,6 +225,30 @@ def add_grocery(request):
             grocery = GroceryItem(  name=grocery_name,
                                     category='misc',
                                     quantity=-1*extractNum(body['quantity']))
+        grocery.save()
+    return update_lists(request)
+
+@csrf_exempt
+def add_single_grocery(request):
+    if(request.method == 'GET'):
+        return render(request,"assistant/grocery.html")
+    body = json.loads(request.body.decode('utf-8'))
+    print(body)
+    if('grocery' in body):
+        try:
+            #known grocery
+            grocery_name = body['grocery'].replace(' - ',' ')
+            grocery = GroceryItem.objects.get(name=grocery_name)
+            if(grocery.quantity < 0):#in grocery list
+                grocery.quantity -= grocery.default_quant
+            else:#remove from stock and add to grocery list
+                grocery.quantity = -1*grocery.default_quant
+        except:
+            #new grocery
+            grocery_name = body['grocery'].replace(' - ',' ')
+            grocery = GroceryItem(  name=grocery_name,
+                                    category='misc',
+                                    quantity=-1)
         grocery.save()
     return update_lists(request)
 
@@ -295,6 +345,22 @@ def select_recipe(request):
     response = HttpResponse(response_json, content_type='application/json')
     return response
 
+def select_ingredient(request):
+    json_response = []
+    list_obj = {}
+    if('ingredient' in request.POST):
+        ingredient = GroceryItem.objects.get(name=request.POST['ingredient'])
+        list_obj['name'] = ingredient.name
+        list_obj['category'] = ingredient.category
+        list_obj['gluten'] = ingredient.gluten
+        list_obj['dairy'] = ingredient.dairy
+        list_obj['default_quant'] = ingredient.default_quant
+        list_obj['units'] = ingredient.units
+    json_response.append(list_obj)
+    response_json = json.dumps(json_response)
+    response = HttpResponse(response_json, content_type='application/json')
+    return response
+
 def edit_recipe(request):
     context = {}
     if(request.method == 'GET'):
@@ -368,6 +434,48 @@ def edit_recipe(request):
         if(not included):
             recipe.optional_ingredients.remove(ingredient)
     recipe.save()
+    return edit(request)
+
+def edit_ingredient(request):
+    context = {}
+    if(request.method == 'GET'):
+        return render(request,"assistant/edit.html", context)
+    if('ingredient_name' in request.POST):
+        name = ' '+request.POST['ingredient_name'].lower()
+    if('ingr_cat' in request.POST):
+        category = request.POST['ingr_cat'].lower()
+    gluten = False
+    if('ingredient_gluten' in request.POST):
+        if(request.POST['ingredient_gluten'] == 'on'):
+            gluten = True
+    dairy = False
+    if('ingredient_dairy' in request.POST):
+        if(request.POST['ingredient_dairy'] == 'on'):
+            dairy = True
+    if('ingredient_default_quant' in request.POST):
+        default_quant = request.POST['ingredient_default_quant']
+    if('ingredient_units' in request.POST):
+        units = request.POST['ingredient_units']
+    if(len(GroceryItem.objects.filter(name=name)) > 0):
+        ingr = GroceryItem.objects.get(name=name)
+        if(ingr.category != category):
+            ingr.category = category
+        if(ingr.gluten != gluten):
+            ingr.gluten = gluten
+        if(ingr.dairy != dairy):
+            ingr.dairy = dairy
+        if(ingr.default_quant != default_quant):
+            ingr.default_quant = default_quant
+        if(ingr.units != units):
+            ingr.units = units
+    else:
+        ingr = GroceryItem(name=name,
+                            category=category,
+                            gluten=gluten,
+                            dairy=dairy,
+                            default_quant=default_quant,
+                            units=units)
+    ingr.save()
     return edit(request)
 
 @csrf_exempt

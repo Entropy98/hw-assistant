@@ -41,6 +41,17 @@ function toggleOptionalIngr(recipe){
   document.getElementById(recipe+"_optional_list").classList.toggle("show");
 }
 
+function toggleDropdownContent(){
+  items = document.getElementsByClassName('dropdown_edit_item');
+  for(var i=0; i<items.length; i++){
+    items[i].classList.toggle("hide");
+  }
+  forms = document.getElementsByClassName('edit_form');
+  for(var i=0; i<forms.length; i++){
+    forms[i].classList.toggle("hide");
+  }
+}
+
 function chooseRecipeOptionals(recipe){
   document.getElementById(recipe+"_optional_dropdown").classList.toggle("show");
 }
@@ -309,6 +320,31 @@ function updateRecipe(recipe){
   }
 }
 
+function selectIngredient(ingredient){
+  $.ajax({
+    url: '/select_ingredient',
+    type: 'POST',
+    data: 'ingredient='+ingredient+
+          '&csrfmiddlewaretoken='+getCSRFToken(),
+    dataType: 'json',
+    success: updateIngredient,
+    error: updateError
+  });
+}
+
+function updateIngredient(ingredient){
+  data = ingredient[0];
+  document.getElementById('ingredient_name').value = data.name.replace(' ','');
+  radios = document.getElementsByClassName('radio_btn');
+  for(var i=0; i<radios.length; i++){
+    radios[i].checked = false;
+  }
+  document.getElementById(data.category).checked = true;
+  document.getElementById('ingredient_gluten').checked = data.gluten;
+  document.getElementById('ingredient_dairy').checked = data.dairy;
+  document.getElementById('ingredient_default_quant').value = data.default_quant;
+  document.getElementById('ingredient_units').value = data.units;
+}
 
 function updateRecipes(section,direction){
   cards = [];

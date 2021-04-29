@@ -27,7 +27,9 @@ urlpatterns = [
     path('store_grocery',views.swap_list),
     path('repeat_grocery',views.swap_list),
     path('add_grocery',views.add_grocery),
+    path('add_single_grocery',views.add_single_grocery),
     path('add_stock',views.add_stock),
+    path('add_single_stock',views.add_single_stock),
     path('remove_grocery',views.remove_grocery),
     path('remove_stock',views.remove_stock),
     path('update_lists',views.update_lists),
@@ -36,4 +38,6 @@ urlpatterns = [
     path('select_recipe', views.select_recipe),
     path('edit_recipe', views.edit_recipe, name='edit_recipe'),
     path('buy_recipe',views.buy_recipe, name='buy_recipe'),
+    path('select_ingredient',views.select_ingredient),
+    path('edit_ingredient',views.edit_ingredient, name='edit_ingredient'),
 ]
