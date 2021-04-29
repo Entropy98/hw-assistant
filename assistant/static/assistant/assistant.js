@@ -15,18 +15,27 @@ window.onclick = function(event){
 }
 
 function toggleMissingIngr(recipe){
+  caret = document.getElementById(recipe+'_missing').children[0];
+  caret.classList.toggle('fa-caret-right');
+  caret.classList.toggle('fa-caret-down');
   document.getElementById(recipe+"_missing_list").classList.toggle("show");
   document.getElementById(recipe+"_ingredients_list").classList.remove("show");
   document.getElementById(recipe+"_optional_list").classList.remove("show");
 }
 
 function toggleIngr(recipe){
+  caret = document.getElementById(recipe+'_ingredients').children[0];
+  caret.classList.toggle('fa-caret-right');
+  caret.classList.toggle('fa-caret-down');
   document.getElementById(recipe+"_missing_list").classList.remove("show");
   document.getElementById(recipe+"_ingredients_list").classList.toggle("show");
   document.getElementById(recipe+"_optional_list").classList.remove("show");
 }
 
 function toggleOptionalIngr(recipe){
+  caret = document.getElementById(recipe+'_optional').children[0];
+  caret.classList.toggle('fa-caret-right');
+  caret.classList.toggle('fa-caret-down');
   document.getElementById(recipe+"_missing_list").classList.remove("show");
   document.getElementById(recipe+"_ingredients_list").classList.remove("show");
   document.getElementById(recipe+"_optional_list").classList.toggle("show");
